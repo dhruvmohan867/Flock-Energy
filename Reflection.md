@@ -1,37 +1,58 @@
 # Reflection
 
-## Challenges Faced
+## Initial Approach
 
-### CSRF Protection
-The most unexpected challenge was the legacy portal's CSRF protection. The `POST /login` endpoint returned `403 Forbidden` with "Cross-site POST form submissions are forbidden" when called without proper `Origin` and `Referer` headers. This was only discoverable by actually executing requests against the real portal — static code review alone would have missed it entirely.
+When I first looked at the assignment, I assumed the portal would expose straightforward REST endpoints that could be wrapped directly. After spending some time exploring the application through Chrome DevTools, I realized the challenge was not writing the API itself, but understanding how the legacy portal actually worked behind the scenes.
 
-### Form-Encoded vs JSON
-The portal expects `application/x-www-form-urlencoded` for login, not `application/json`. Sending JSON resulted in authentication failures. This required using `URLSearchParams` to properly encode the credentials and setting the correct `Content-Type` header.
+---
 
-### Non-Existent Endpoint
-The initial implementation included a `GET /portal/meters/{meterId}` endpoint for fetching a single meter by ID. Live testing revealed this endpoint does not exist on the portal (returns 404). This dead route, service method, and controller function had to be removed.
+## Biggest Challenges
 
-## Architecture Decisions
+The most difficult part was understanding the authentication flow.
 
-### Why Axios Interceptors
-Interceptors cleanly separate authentication concerns from business logic. Services call `apiClient.get()` without knowing anything about cookies or re-authentication. The interceptor handles everything transparently.
+Initially, I was able to identify the login endpoint, but every login attempt returned a `403 Forbidden` response. After comparing my requests with the browser requests in the Network tab, I discovered that the portal expected `Origin` and `Referer` headers in addition to form-encoded credentials. Once those matched the browser's behaviour, authentication worked successfully.
 
-### Why In-Memory Cookie Storage
-For a single-instance deployment, an in-memory singleton is the simplest, fastest, and most correct solution. It avoids unnecessary complexity from external stores.
+Another challenge was understanding how individual meter details were retrieved. I initially assumed there would be a dedicated endpoint for fetching a meter by its ID. During testing, I discovered that such an endpoint always returned `404 Not Found`. Instead, the portal reused the search endpoint, and providing an exact meter ID through the search parameter returned the required record.
 
-### Why Startup Authentication
-The server authenticates during bootstrap (`server.js`) rather than lazily on the first request. This ensures the first client request doesn't pay the penalty of a 401-then-retry round trip.
+---
 
-## What Could Be Improved
+## Assumptions
 
-1. **Redis for Horizontal Scaling**: Replace `CookieManager` with a Redis-backed store if the backend needs to run across multiple instances.
-2. **Circuit Breaker**: Wrap the Axios client in a circuit breaker to prevent cascading failures if the legacy portal goes down.
-3. **Structured Logging**: Replace `console.log` with a structured logger like Pino for production observability.
-4. **Rate Limiting**: Add rate limiting to prevent clients from overwhelming the legacy portal.
-5. **Response Caching**: Cache frequently accessed data (like transformer lists) to reduce load on the portal.
+While working on the assignment, I made a few assumptions:
 
-## Lessons Learned
+- The backend would operate using a single service account.
+- The portal's response structure would remain consistent.
+- A single backend instance was sufficient, making in-memory session storage an acceptable choice for this assignment.
 
-- Always test against the real system. Static code review missed both the CSRF issue and the non-existent endpoint.
-- Legacy systems have undocumented behaviors that only surface during runtime.
-- The Promise lock pattern is essential when multiple concurrent failures can trigger the same recovery action.
+---
+
+## What I Learned
+
+The biggest lesson from this assignment was the importance of investigating a system before implementing a solution.
+
+Instead of relying on assumptions, I learned to inspect real network traffic, compare browser requests with my own implementation, and validate every behaviour through testing.
+
+I also gained a much better understanding of session-based authentication, cookie management, and how browser applications communicate with backend services.
+
+---
+
+## If I Had More Time
+
+If I had additional time, I would focus on improving the overall quality of the project rather than adding more endpoints.
+
+Some improvements I would consider include:
+
+- Adding automated integration tests.
+- Replacing the in-memory session storage with a distributed solution for scalability.
+- Adding structured logging for easier debugging.
+- Implementing rate limiting to better protect the legacy portal.
+
+---
+
+## Self Review
+
+Looking back at my own submission, I think the implementation successfully meets the assignment requirements and provides a clean abstraction over the legacy portal.
+
+The main area I would improve is production readiness. While the current solution is appropriate for the assignment, features such as distributed session storage, automated testing, and enhanced monitoring would be important before deploying it in a production environment.
+
+Overall, this assignment was a valuable exercise in investigating an undocumented system, understanding its behaviour through observation, and designing a clean API around it rather than simply writing code.
