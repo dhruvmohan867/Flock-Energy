@@ -1,15 +1,22 @@
 import axios from 'axios';
 import env from '../config/env.js';
 import cookieManager from '../utils/cookieManager.js';
+
 let loginPromise = null;
 
 async function login() {
   if (loginPromise) {
     return loginPromise;
   }
-  loginPromise = axios.post(`${env.LEGACY_PORTAL_URL}/login`, {
+  loginPromise = axios.post(`${env.LEGACY_PORTAL_URL}/login`, new URLSearchParams({
     email: env.LEGACY_EMAIL,
     password: env.LEGACY_PASSWORD
+  }), {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Origin': env.LEGACY_PORTAL_URL,
+      'Referer': `${env.LEGACY_PORTAL_URL}/login`
+    }
   }).then((response) => {
     const cookies = response.headers['set-cookie'];
     if (cookies && cookies.length > 0) {
@@ -21,4 +28,5 @@ async function login() {
   });
   return loginPromise;
 }
+
 export default { login };

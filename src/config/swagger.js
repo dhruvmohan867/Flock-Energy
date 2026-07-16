@@ -16,61 +16,111 @@ const swaggerDocument = {
   paths: {
     '/meters': {
       get: {
-        summary: 'Get a list of meters',
+        summary: 'Search meters',
+        tags: ['Meters'],
         parameters: [
-          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
-          { name: 'search', in: 'query', schema: { type: 'string' } }
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 }, description: 'Page number' },
+          { name: 'search', in: 'query', schema: { type: 'string' }, description: 'Search query by meter ID' }
         ],
         responses: {
-          200: { description: 'Successful response' },
+          200: {
+            description: 'Paginated list of meters',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { type: 'array', items: { type: 'object', properties: { meterId: { type: 'string' }, serialNo: { type: 'string' }, make: { type: 'string' }, phaseType: { type: 'string' }, installStatus: { type: 'string' }, dtCode: { type: 'string' } } } },
+                    total: { type: 'integer' },
+                    page: { type: 'integer' },
+                    pageSize: { type: 'integer' }
+                  }
+                }
+              }
+            }
+          },
           400: { description: 'Invalid query parameters' },
-          500: { description: 'Internal server error' }
-        }
-      }
-    },
-    '/meters/{meterId}': {
-      get: {
-        summary: 'Get a specific meter by ID',
-        parameters: [
-          { name: 'meterId', in: 'path', required: true, schema: { type: 'string' } }
-        ],
-        responses: {
-          200: { description: 'Successful response' },
-          400: { description: 'Invalid meter ID' },
           500: { description: 'Internal server error' }
         }
       }
     },
     '/meters/{meterId}/geo': {
       get: {
-        summary: 'Get geospatial data for a meter',
+        summary: 'Get meter geolocation',
+        tags: ['Meters'],
         parameters: [
-          { name: 'meterId', in: 'path', required: true, schema: { type: 'string' } }
+          { name: 'meterId', in: 'path', required: true, schema: { type: 'string' }, description: 'Meter ID' }
         ],
         responses: {
-          200: { description: 'Successful response' }
+          200: {
+            description: 'Geospatial coordinates of the meter',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { type: 'object', properties: { latitude: { type: 'string' }, longitude: { type: 'string' } } }
+                  }
+                }
+              }
+            }
+          },
+          400: { description: 'Invalid meter ID' },
+          500: { description: 'Internal server error' }
         }
       }
     },
     '/meters/{meterId}/energy': {
       get: {
-        summary: 'Get historical energy readings for a meter',
+        summary: 'Get meter energy history',
+        tags: ['Meters'],
         parameters: [
-          { name: 'meterId', in: 'path', required: true, schema: { type: 'string' } }
+          { name: 'meterId', in: 'path', required: true, schema: { type: 'string' }, description: 'Meter ID' }
         ],
         responses: {
-          200: { description: 'Successful response' }
+          200: {
+            description: 'Historical energy readings',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { type: 'array', items: { type: 'object', properties: { timestamp: { type: 'string' }, kwh: { type: 'string' }, kvah: { type: 'string' }, voltR: { type: 'string' } } } }
+                  }
+                }
+              }
+            }
+          },
+          500: { description: 'Internal server error' }
         }
       }
     },
     '/transformers': {
       get: {
-        summary: 'Get a list of transformers',
+        summary: 'Get transformers list',
+        tags: ['Transformers'],
         parameters: [
-          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } }
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 }, description: 'Page number' }
         ],
         responses: {
-          200: { description: 'Successful response' }
+          200: {
+            description: 'Paginated list of transformers',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { type: 'array', items: { type: 'object', properties: { code: { type: 'string' }, name: { type: 'string' }, feederCode: { type: 'string' }, capacityKva: { type: 'integer' } } } },
+                    total: { type: 'integer' },
+                    page: { type: 'integer' },
+                    pageSize: { type: 'integer' }
+                  }
+                }
+              }
+            }
+          },
+          400: { description: 'Invalid query parameters' },
+          500: { description: 'Internal server error' }
         }
       }
     }
