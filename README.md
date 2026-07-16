@@ -158,11 +158,8 @@ The API was manually verified for the following scenarios:
 The Swagger configuration is defined in [src/config/swagger.js](./src/config/swagger.js) and served at `/api-docs`. It defines all paths, parameters, and response schemas.
 
 ## Reflection
-- **What assumptions did I make?** I assumed that performance under heavy load was less critical for this assignment than establishing a robust, self-healing authentication architecture.
-- **What was the most difficult part?** Bypassing the portal's undocumented CSRF protection. My initial `POST /login` requests were rejected with `403 Forbidden` until I added the exact `Origin` and `Referer` headers required.
-- **How did I get unstuck?** By meticulously comparing my Node.js request headers with the successful browser requests in the Network tab, I identified the missing CSRF headers and the required `application/x-www-form-urlencoded` content type.
-- **What mistake did I make?** I initially assumed the portal supported a direct `GET /portal/meters/{meterId}` endpoint. Live testing proved this returns a 404. I had to pivot and implement single-meter lookup by filtering the search endpoint.
-- **If reviewing my own submission, what would I criticize?** The reliance on an in-memory variable for the session cookie limits scalability. While acceptable for the assignment, a senior engineer would flag this during a system design review for a production environment.
+
+A detailed reflection covering the challenges encountered, assumptions made, lessons learned, and self-review during the assignment is available in [REFLECTION.md](./REFLECTION.md).
 
 ## License
 ISC
