@@ -2,10 +2,13 @@ import axios from 'axios';
 import env from '../config/env.js';
 import cookieManager from './cookieManager.js';
 import authService from '../services/authService.js';
+
 const apiClient = axios.create({
   baseURL: env.LEGACY_PORTAL_URL,
-  withCredentials: true
+  withCredentials: true,
+  timeout: 10000
 });
+
 apiClient.interceptors.request.use((config) => {
   const cookie = cookieManager.getCookie();
   if (cookie) {
@@ -13,6 +16,7 @@ apiClient.interceptors.request.use((config) => {
   }
   return config;
 });
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -29,4 +33,5 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
 export default apiClient;
