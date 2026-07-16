@@ -1,30 +1,38 @@
 import meterService from '../services/meterService.js';
-
-async function search(req, res, next) {
+async function getMeters(req, res, next) {
   try {
-    const data = await meterService.search(req.query);
+    const { page, search } = req.query;
+    const data = await meterService.getMeters(page, search);
     res.json(data);
   } catch (error) {
     next(error);
   }
 }
-
-async function getGeo(req, res, next) {
+async function getMeterById(req, res, next) {
   try {
-    const data = await meterService.getGeo(req.params.meterId);
+    const { meterId } = req.params;
+    const data = await meterService.getMeterById(meterId);
     res.json(data);
   } catch (error) {
     next(error);
   }
 }
-
-async function getEnergy(req, res, next) {
+async function getMeterGeo(req, res, next) {
   try {
-    const data = await meterService.getEnergy(req.params.meterId);
+    const { meterId } = req.params;
+    const data = await meterService.getMeterGeo(meterId);
     res.json(data);
   } catch (error) {
     next(error);
   }
 }
-
-export default { search, getGeo, getEnergy };
+async function getMeterEnergy(req, res, next) {
+  try {
+    const { meterId } = req.params;
+    const data = await meterService.getMeterEnergy(meterId);
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+export default { getMeters, getMeterById, getMeterGeo, getMeterEnergy };
