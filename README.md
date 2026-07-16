@@ -159,7 +159,7 @@ The Swagger configuration is defined in [src/config/swagger.js](./src/config/swa
 
 ## Reflection
 
-A detailed reflection covering the challenges encountered, assumptions made, lessons learned, and self-review during the assignment is available in [REFLECTION.md](./REFLECTION.md).
+A detailed reflection covering the challenges encountered, assumptions made, lessons learned, and self-review during the assignment is available in [Reflection.md](./Reflection.md).
 
 ## License
 ISC
