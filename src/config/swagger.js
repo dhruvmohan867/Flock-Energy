@@ -44,6 +44,31 @@ const swaggerDocument = {
         }
       }
     },
+    '/meters/{meterId}': {
+      get: {
+        summary: 'Get a single meter by ID',
+        tags: ['Meters'],
+        parameters: [
+          { name: 'meterId', in: 'path', required: true, schema: { type: 'string' }, description: 'Meter ID' }
+        ],
+        responses: {
+          200: {
+            description: 'Single meter object',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: { meterId: { type: 'string' }, serialNo: { type: 'string' }, make: { type: 'string' }, phaseType: { type: 'string' }, installStatus: { type: 'string' }, dtCode: { type: 'string' } }
+                }
+              }
+            }
+          },
+          400: { description: 'Invalid meter ID' },
+          404: { description: 'Meter not found' },
+          500: { description: 'Internal server error' }
+        }
+      }
+    },
     '/meters/{meterId}/geo': {
       get: {
         summary: 'Get meter geolocation',

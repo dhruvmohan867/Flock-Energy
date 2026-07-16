@@ -10,6 +10,16 @@ async function getMeters(req, res, next) {
   }
 }
 
+async function getMeterById(req, res, next) {
+  try {
+    const { meterId } = req.params;
+    const data = await meterService.getMeterById(meterId);
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function getMeterGeo(req, res, next) {
   try {
     const { meterId } = req.params;
@@ -30,4 +40,4 @@ async function getMeterEnergy(req, res, next) {
   }
 }
 
-export default { getMeters, getMeterGeo, getMeterEnergy };
+export default { getMeters, getMeterById, getMeterGeo, getMeterEnergy };
